@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beer Drinker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='mainPage.css') }}">
+</head>
+<body>
+    <h1>Beer Drinker</h1>
+    <form method="POST" action="/solve">
+        <label for="beer">Beers to drink:</label>
+        <br>
+        <input type="number" name="beer" id="beer" required>
+        <br>
+        <input type="submit" value="Start drinking">
+    </form>
+    <p id="result">{{ result_ }}</p>
+    <p><a href="/download_csv">View Job History</a></p>
+    <form method="GET" action="/logout">
+        <input type="submit" value="Logout">
+    </form>
+</body>
+</html>

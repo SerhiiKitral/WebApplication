@@ -1,0 +1,47 @@
+/* Apply some basic styles to the body and headings */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #404040;
+}
+
+h1 {
+    color: #333;
+}
+
+/* Style the login and register forms */
+form {
+    max-width: 300px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px #ccc;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%; /* Make the input fields take up the full width */
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+/* Adjust the width of the email and password fields */
+input[type="email"],
+input[type="password"] {
+    width: 80%; /* Make them full width */
+}
+
+/* Style the "Don't have an account?" link */
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}

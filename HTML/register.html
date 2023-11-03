@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='logRegStyle.css') }}">
+</head>
+<body>
+    <h1>Registration</h1>
+    <form method="POST" action="/register">
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" required>
+        <br>
+        <label for="password">Password:</label>
+        <input type="password" name="password" id="password" required>
+        <br>
+        <input type="submit" value="Register">
+    </form>
+    <p>Already have an account? <a href="/login">Login</a></p>
+    <p id="error-message" style="color: red;">{{ error_message }}</p>
+</body>
+</html>

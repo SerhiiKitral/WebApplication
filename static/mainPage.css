@@ -1,0 +1,99 @@
+/* Apply some basic styles to the body and headings */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #404040;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* Style the main content container */
+main {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px #ccc;
+    padding: 20px;
+}
+
+/* Style the "Beer Drinker" form section */
+form {
+    flex: 1;
+    padding: 20px;
+}
+
+form h1 {
+    color: #007bff;
+    text-align: left;
+}
+
+form label {
+    color: #333;
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+}
+
+form input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+form input[type="submit"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+form input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Style the result and progress bar section */
+#result {
+    font-weight: bold;
+    margin-top: 20px;
+    text-align: center;
+}
+
+#progress-bar {
+    flex: 1;
+    text-align: center;
+}
+
+#progress {
+    width: 0;
+    height: 20px;
+    background-color: #007bff;
+    transition: width 0.5s;
+}
+
+/* Style the "View Job History" link */
+a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: #007bff;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
