@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 @app.route('/calculate', methods=['POST'])
 def calculate():
+    print("got to server2")
     data = request.get_json()
     user_name = data["user_name"]
     beer_count = data["beer_count"]
@@ -13,10 +14,13 @@ def calculate():
     calc_result, execution_time = calculate_beer_drinking(user_name, beer_count)
 
     response_data = {
+        "user_name": user_name,
+        "beer_count": beer_count,
         "result": calc_result,
         "execution_time": execution_time
     }
 
+    print("exiting server2")
     return jsonify(response_data)
 
 

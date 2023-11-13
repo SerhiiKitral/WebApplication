@@ -9,10 +9,9 @@ import requests
 app = Flask(__name__, template_folder="HTML")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users_data.db'
+handling_server = "http://localhost:8088"
 db = SQLAlchemy(app)
 
-calculation_servers = ["http://localhost:8085", "http://localhost:8086", "http://localhost:8087"]
-current_server_index = 0
 
 
 class User(db.Model):
@@ -54,7 +53,6 @@ def calculate_beer_drinking(user_name, beer_count):
 
 @app.route('/solve', methods=['POST'])
 def solve():
-    global current_server_index
     execution_time = 0
     beer_count = int(request.form['beer'])
     user_id = session.get('user_id')
@@ -63,25 +61,37 @@ def solve():
         if user:
             user_name = user.email
 
-            server_url = calculation_servers[current_server_index]
-            current_server_index = (current_server_index + 1) % len(calculation_servers)
-
             try:
-                response = requests.post(f"{server_url}/calculate",
-                                         json={"user_name": user_name, "beer_count": beer_count})
+                print("started")
+                response = requests.post(f"{handling_server}/choose",
+                                         json={
+                                             "user_name": user_name,
+                                             "beer_count": beer_count,
+                                         })
                 if response.status_code == 200:
-                    data = response.json()
-                    calc_result = data["result"]
-                    execution_time = data.get("execution_time", 0)
+                    if type(response) != list:
+                        data = response.json()
+                        calc_result = data["result"]
+                        execution_time = data.get("execution_time", 0)
+                    else:
+                        calc_result = "Done"
                 else:
                     calc_result = "error"
             except Exception as e:
                 calc_result = "error"
 
-            log_entry = Log(user_name=user_name, execution_time=execution_time, result=calc_result,
-                            number_of_beers=beer_count)
-            db.session.add(log_entry)
-            db.session.commit()
+            if calc_result != "Currently busy":
+                if type(response) == list:
+                    for el in response:
+                        log_entry = Log(user_name=user_name, execution_time=el["execution_time"], result=el["result"],
+                                        number_of_beers=el["beer_count"])
+                        db.session.add(log_entry)
+                        db.session.commit()
+                else:
+                    log_entry = Log(user_name=user_name, execution_time=execution_time, result=calc_result,
+                                    number_of_beers=beer_count)
+                    db.session.add(log_entry)
+                    db.session.commit()
 
             return render_template('index.html', result_="Result: " + calc_result)
 
