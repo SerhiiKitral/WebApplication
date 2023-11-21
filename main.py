@@ -1,6 +1,8 @@
 import csv
 import io
-from flask import Flask, render_template, request, redirect, url_for, session, Response
+
+import flask
+from flask import Flask, render_template, request, redirect, url_for, session, Response, jsonify
 from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 import time
@@ -9,9 +11,8 @@ import requests
 app = Flask(__name__, template_folder="HTML")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users_data.db'
-handling_server = "http://localhost:8088"
+handling_server = "http://127.0.0.1:8088"
 db = SQLAlchemy(app)
-
 
 
 class User(db.Model):
@@ -51,9 +52,8 @@ def calculate_beer_drinking(user_name, beer_count):
     return calc_result, execution_time
 
 
-@app.route('/solve', methods=['POST'])
-def solve():
-    execution_time = 0
+@app.route('/postdatatohandlingserver', methods=['POST'])
+def postdatatohandlingserver():
     beer_count = int(request.form['beer'])
     user_id = session.get('user_id')
     if user_id:
@@ -61,41 +61,46 @@ def solve():
         if user:
             user_name = user.email
 
-            try:
-                print("started")
-                response = requests.post(f"{handling_server}/choose",
-                                         json={
-                                             "user_name": user_name,
-                                             "beer_count": beer_count,
-                                         })
-                if response.status_code == 200:
-                    if type(response) != list:
-                        data = response.json()
-                        calc_result = data["result"]
-                        execution_time = data.get("execution_time", 0)
-                    else:
-                        calc_result = "Done"
-                else:
-                    calc_result = "error"
-            except Exception as e:
-                calc_result = "error"
+            print("Sending request to handling server")
 
-            if calc_result != "Currently busy":
-                if type(response) == list:
-                    for el in response:
-                        log_entry = Log(user_name=user_name, execution_time=el["execution_time"], result=el["result"],
-                                        number_of_beers=el["beer_count"])
-                        db.session.add(log_entry)
-                        db.session.commit()
-                else:
-                    log_entry = Log(user_name=user_name, execution_time=execution_time, result=calc_result,
-                                    number_of_beers=beer_count)
-                    db.session.add(log_entry)
-                    db.session.commit()
+            data_to_post = {"user_name": user_name, "beer_count": beer_count}
+            response = requests.post(f"{handling_server}/choose", json=data_to_post)
+            if response.json()["result"] == "success":
+                data = response.json()
+                calc_result = data["result"]
+            else:
+                calc_result = "Done"
 
+            if calc_result == "success":
+                calc_result = "Calculating..."
+            print(f"Request to handling server has been sent, Calc result: {calc_result}")
             return render_template('index.html', result_="Result: " + calc_result)
 
-    return render_template('index.html',)
+    return render_template('index.html')
+
+
+@app.route('/retreiveresult', methods=['GET', 'POST'])
+def reitreiveresult():
+    print("Getting result from handling server")
+
+    data = request.get_json()
+
+    print("Updating page")
+    print(data)
+    user_id = session.get('user_id')
+    user_name = data["user_name"]
+    beer_count = data["beer_count"]
+    calc_result = data["result"]
+    execution_time = data["execution_time"]
+    print("Adding value to database")
+    log_entry = Log(user_name=user_name, execution_time=execution_time, result=calc_result,
+                    number_of_beers=beer_count)
+    db.session.add(log_entry)
+    db.session.commit()
+    render_template('index.html',
+                          result_=f"Result: {calc_result}, Execution Time: {execution_time}")
+
+    return jsonify({"result": "success"})
 
 
 @app.route('/index')
